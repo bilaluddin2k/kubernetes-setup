@@ -67,5 +67,13 @@ chown $(id -u):$(id -g) $HOME/.kube/config
 
 kubectl apply -f https://calico-v3-25.netlify.app/archive/v3.25/manifests/calico.yaml
 
+kubectl apply -f https://calico-v3-25.netlify.app/archive/v3.25/manifests/calico.yaml
+kubectl get nodes
+kubectl get nodes
+kubectl get nodes -o wide
+kubectl -n kube-system get pods
+kubectl get nodes -o wide
+systemctl enable kubelet
+kubeadm version
 
 
