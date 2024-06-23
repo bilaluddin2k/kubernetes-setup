@@ -77,3 +77,5 @@ systemctl enable kubelet
 kubeadm version
 
 
+"RUN BELOW COMMAND IN WORKER NODE AND CHANGE ACCORDING TO YOUR MASTER IP AND PORT"
+sudo kubeadm join 10.10.0.19:6443 --token 4y4jr7.yivn89dsgxkz8ib2     --discovery-token-ca-cert-hash sha256:e3930655ab3939151f713c6ec32db385da691a093df1ea83672b9559ad964c69 --cri-socket=unix:///var/run/cri-dockerd.sock
