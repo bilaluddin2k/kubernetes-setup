@@ -1,0 +1,71 @@
+hostnamectl set-hostname --static k8-master
+vi /etc/hosts
+bash
+swapon -s
+swapoff /dev/dm-1
+vi /etc/fstab
+wget https://github.com/Mirantis/cri-dockerd/releases/download/v0.3.14/cri-dockerd-0.3.14-3.el7.x86_64.rpm
+sudo apt-get install -y apt-transport-https ca-certificates curl gpg
+sudo setenforce 0
+sudo sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
+cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
+[kubernetes]
+name=Kubernetes
+baseurl=https://pkgs.k8s.io/core:/stable:/v1.30/rpm/
+enabled=1
+gpgcheck=1
+gpgkey=https://pkgs.k8s.io/core:/stable:/v1.30/rpm/repodata/repomd.xml.key
+exclude=kubelet kubeadm kubectl cri-tools kubernetes-cni
+EOF
+sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
+history
+sudo systemctl enable --now kubelet
+systemctl stop firewalld
+systemctl disable firewalld
+docker ps
+systemctl start docker
+systemctl status dockerd
+systemctl status docker
+
+sudo yum install -y yum-utils
+sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+sudo yum install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+systemctl start docker
+systemctl enable docker
+
+
+rpm -ivh cri-dockerd-0.3.14-3.el7.x86_64.rpm
+
+systemctl start cri-docker
+
+
+vim kubeadm-config.yml
+apiVersion: kubeadm.k8s.io/v1beta3
+kind: ClusterConfiguration
+kubernetesVersion: v1.30.2
+---
+apiVersion: kubelet.config.k8s.io/v1beta1
+kind: KubeletConfiguration
+cgroupDriver: cgroupfs
+---
+apiVersion: kubeadm.k8s.io/v1beta3
+kind: InitConfiguration
+nodeRegistration:
+  criSocket: unix:///var/run/cri-dockerd.sock
+
+
+kubeadm init --config kubeadm-config.yml
+
+
+
+
+mkdir -p $HOME/.kube
+cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+chown $(id -u):$(id -g) $HOME/.kube/config
+
+
+
+kubectl apply -f https://calico-v3-25.netlify.app/archive/v3.25/manifests/calico.yaml
+
+
+
