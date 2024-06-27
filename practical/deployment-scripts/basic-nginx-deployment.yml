@@ -1,0 +1,17 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ name: facer
+spec:
+ replicas: 3
+ selector:
+  matchLabels:
+   app: webserver-nginx
+ template:
+  metadata:
+   labels:
+    app: webserver-nginx
+  spec:
+   containers:
+   - name: nginx-server
+     image: nginx
