@@ -55,8 +55,10 @@ nodeRegistration:
 
 
 kubeadm init --config kubeadm-config.yml
-
-
+or 
+kubeadm init --cri-socket=unix:///var/run/cri-dockerd.sock 
+# Prefer this method. 
+# if used conmmand this way then no need to create kubeadm-config.yml config file.
 
 
 mkdir -p $HOME/.kube
